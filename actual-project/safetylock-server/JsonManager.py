@@ -36,11 +36,7 @@ class JsonManager :
             return True
         else : 
             return False
-
-    def login(self):
+    
+    def remove_from_list(self, file, identifier) :
         pass
 
-
-if __name__ == '__main__' :
-    j = JsonManager()
-    j.add_to_list('\\data\\usersdb.json', {"nome" : "roberta", "password" : "4321"})
