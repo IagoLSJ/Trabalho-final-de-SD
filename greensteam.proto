@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+option java_package = "com.greensteam.proto";
+
+message Game {
+    string name = 1;
+    int32 downloadQuantity = 2;
+    string description = 3;
+    int32 reviewsPercentage = 4;
+    Reviews reviews = 5;
+}
+
+message Publisher {
+    string name = 1;
+    repeated Game games = 2;
+    int32 followers = 3;
+}
+
+message User {
+    string name = 1;
+    repeated Game library = 2;
+    string bio = 3;
+    int32 achievements = 4;
+}
+
+message Comment {
+    string authorName = 1;
+    bool recomendation = 2;
+    string content = 3;
+}
+
+message Message {
+    int32 type = 1;
+    int32 id = 2;
+    string obfReference = 3; //Objeto remoto
+    string methodId = 4; //Metodo remoto
+    bytes arguments = 5;
+    Error error = 6;
+}
+
+message Reviews {
+    repeated Comment comments = 1;
+}
+
+message Error {
+    string error = 1;
+}
