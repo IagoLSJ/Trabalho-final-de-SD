@@ -8,14 +8,14 @@ class Cofre :
         self.passworddb = '\\data\\passworddb.json'
         self.jmanager = JsonManager()
     
-    def signUp(self, user) :
+    def sign_up(self, user) :
         res = self.jmanager.add_to_list(self.usersdb, user)
         if not res:
             return {"status" : "500", "body" : "Internal Server Error"}
         else : 
             return {"status" : "200", "body" : "Seja bem-vinda(o),"+user['username']+"!"}
 
-    def logIn(self, user) :
+    def login(self, user) :
         data = self.jmanager.get_file_contents(self.usersdb)
         if not data : 
             return {"status" : "500", "body" : "Internal Server Error"}
@@ -31,19 +31,16 @@ class Cofre :
             
                  
     
-    def salvarSenha(self, password) :
+    def salvar_senha(self, password) :
         res = self.jmanager.add_to_list(self.passworddb, password)
         if not res:
             return {"status" : "500", "body" : "Internal Server Error"}
         else : 
             return {"status" : "200", "body" : "Senha salva com sucesso!"}
-
-    def deletarSenha(passId, user) :
-        pass
-
-if __name__ == '__main__':
-    cofre = Cofre()
-    print(cofre.signUp({
-    "username": "Josefina4",
-    "password": "4321"
-  }))
+    
+    def listar_senha(self) :
+        res = self.jmanager.get_file_contents(self.passworddb)
+        if not res:
+            return {"status" : "500", "body" : "Internal Server Error"}
+        else : 
+            return {"status" : "200", "body" : res}
