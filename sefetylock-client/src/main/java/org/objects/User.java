@@ -5,10 +5,10 @@ import java.io.Serializable;
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String email;
-    private String userpass;
-    private String username;
     private String userId;
+    private String email;
+    private String username;
+    private String userpass;
 
     public User(String userId, String username, String userpass, String email) {
         this.email = email;
@@ -16,6 +16,8 @@ public class User implements Serializable {
         this.username = username;
         this.userId = userId;
     }
+
+    public User(){}
 
     // Getters e Setters
     public String getEmail() {

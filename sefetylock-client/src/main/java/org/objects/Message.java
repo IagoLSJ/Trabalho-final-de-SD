@@ -2,20 +2,22 @@ package org.objects;
 
 import com.google.gson.Gson;
 
-public class Message<T> {
+public class Message {
     private int id;
     private int requestId;
     private String type;
     private String endpoint;
-    private T body;
 
-    public Message(int id, int requestId, String type, String endpoint, T body) {
+
+    public Message(int id, int requestId, String type, String endpoint) {
         this.id = id;
-        this.requestId = id;
+        this.requestId = requestId;
         this.type = type;
         this.endpoint = endpoint;
-        this.body = body;
+
     }
+
+    public Message(){}
 
     // Getters e setters
     public int getId() {
@@ -34,10 +36,6 @@ public class Message<T> {
         return endpoint;
     }
 
-    public T getBody() {
-        return body;
-    }
-
     public void setId(int id) {
         this.id = id;
     }
@@ -54,9 +52,6 @@ public class Message<T> {
         this.endpoint = endpoint;
     }
 
-    public void setBody(T body) {
-        this.body = body;
-    }
 
     @Override
     public String toString() {
@@ -66,10 +61,5 @@ public class Message<T> {
     public String toJson() {
         Gson gson = new Gson();
         return gson.toJson(this);
-    }
-
-    public static <T> Message<T> fromJson(String json, Class<T> bodyType) {
-        Gson gson = new Gson();
-        return gson.fromJson(json, Message.class);
     }
 }
