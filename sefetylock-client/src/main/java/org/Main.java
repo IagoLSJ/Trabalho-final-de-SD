@@ -1,125 +1,164 @@
 package org;
 
 import com.google.gson.Gson;
-import org.objects.Password;
-import org.objects.User;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
+import org.entities.Password;
+import org.entities.User;
+
 public class Main {
     ProxyClient proxy;
     Gson gson;
+    private User loggedInUser;
 
     public Main() {
         this.proxy = new ProxyClient();
         this.gson = new Gson();
+        this.loggedInUser = null;
     }
 
-    public String selecionaOperacao() throws IOException {
-
+    public int selecionaOperacao() throws IOException {
         BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-        String opt = null;
+        int opt = 0;
+        String input;
+
         do {
-            opt = stdin.readLine();
-        } while (opt.equals("\n") || opt.equals("") || opt.isEmpty());
+            input = stdin.readLine().trim();
+            try {
+                opt = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Entrada inválida. Por favor, insira um número.");
+            }
+        } while (opt < 1 || opt > (loggedInUser != null ? 6 : 3)); // Ajusta o número máximo com base no estado de login
+
         switch (opt) {
-            case "Login":
+            case 1:
+                User createdUser = new User();
 
-                User user = new User();
-                System.out.print("\nDigite o seu e-mail: ");
-
-                user.setEmail(stdin.readLine());
-
-                System.out.print("\nDigite sua senha: ");
-
-                user.setUserpass(stdin.readLine());
-
-                try {
-                    User userLoged = proxy.login(user);
-
-                    System.out.println("Olá " + userLoged.getUsername() + "!");
-
-                } catch (RuntimeException e) {
-                    System.out.println(e.getMessage());
-                }
-
-                break;
-
-            case "sing up":
-
-               User createdUser = new User();
-
-                System.out.println("\n Digite o seu nome");
+                System.out.println("\nDigite o seu nome");
                 createdUser.setUsername(stdin.readLine());
 
-                System.out.println("\n Digite o seu e-mail");
+                System.out.println("\nDigite o seu e-mail");
                 createdUser.setEmail(stdin.readLine());
 
-                System.out.println("\n Digite sua senha");
+                System.out.println("\nDigite sua senha");
                 createdUser.setUserpass(stdin.readLine());
 
                 try {
                     User created = proxy.sing_up(createdUser);
-
                     System.out.println("Usuário criado com sucesso");
                 } catch (RuntimeException e) {
                     System.out.println(e.getMessage());
                 }
-
                 break;
 
-            case "Cadastrar senha":
+            case 2:
+                User user = new User();
+                System.out.print("\nDigite o seu e-mail: ");
+                user.setEmail(stdin.readLine());
 
-                Password createPassword = new Password();
-                System.out.print("\n Digite o titulo/nome da senha: ");
-                createPassword.setTitle(stdin.readLine());
-
-                System.out.print("\n Digite a senha que você deseja guardar: ");
-                createPassword.setPassword(stdin.readLine());
+                System.out.print("\nDigite sua senha: ");
+                user.setUserpass(stdin.readLine());
 
                 try {
-                   Password createdPassword = proxy.salvar_senha(createPassword);
-
-                   System.out.println("Senha criada com sucesso");
+                    User userLoged = proxy.login(user);
+                    if (userLoged != null) {
+                        loggedInUser = userLoged;
+                        System.out.println("Login bem-sucedido!");
+                        System.out.println(userLoged);
+                    } else {
+                        System.out.println("Falha no login.");
+                    }
                 } catch (RuntimeException e) {
                     System.out.println(e.getMessage());
                 }
-
                 break;
 
-            case "Listar senhas":
-                try {
-                    Password passwords = proxy.listar_senha();
-                    System.out.println("\n senhas: "+passwords);
-                }catch (RuntimeException e){
-                    System.out.println(e.getMessage());
+            case 3:
+                System.out.println("Saindo...");
+                break;
+
+            case 4:
+                if (loggedInUser != null) {
+                    Password createPassword = new Password();
+                    System.out.print("\nDigite o título/nome da senha: ");
+                    createPassword.setTitle(stdin.readLine());
+
+                    System.out.print("\nDigite a senha que você deseja guardar: ");
+                    createPassword.setPassword(stdin.readLine());
+                    createPassword.setUserId(loggedInUser.getId());
+
+                    try {
+                        Password createdPassword = proxy.salvar_senha(createPassword);
+                        System.out.println(createdPassword);
+                    } catch (RuntimeException e) {
+                        System.out.println(e.getMessage());
+                    }
+                } else {
+                    System.out.println("Você deve estar logado para salvar uma senha.");
                 }
                 break;
-            case "Encerrar":
+
+            case 5:
+                if (loggedInUser != null) {
+                    try {
+                        List<Password> passwords = proxy.listar_senhas(loggedInUser.getId());
+                        if (passwords != null && !passwords.isEmpty()) {
+                            System.out.println("\nSenhas:");
+                            for (Password password : passwords) {
+                                System.out.println(password);
+                            }
+                        } else {
+                            System.out.println("Nenhuma senha encontrada.");
+                        }
+                    } catch (RuntimeException e) {
+                        System.out.println(e.getMessage());
+                    }
+                } else {
+                    System.out.println("Você deve estar logado para listar as senhas.");
+                }
                 break;
+
+            case 6:
+                if (loggedInUser != null) {
+                    loggedInUser = null;
+                    System.out.println("Logout realizado com sucesso.");
+                } else {
+                    System.out.println("Você não está logado.");
+                }
+                break;
+
             default:
-                System.out.println("Operação invalida, tente outra.");
+                System.out.println("Operação inválida, tente outra.");
                 break;
         }
         return opt;
     }
 
     public void printMenu() {
-        System.out.println("\nDigite a operação que deseja executar: ");
-        System.out.println("sing up");
-        System.out.println("Login");
-        System.out.println("Guardar senha");
-        System.out.println("Listar senhas");
-        System.out.println("Encerrar -  Desligar contato com o servidor \n");
+        System.out.println("\nDigite o número da operação que deseja executar: \n");
+        if (loggedInUser == null) {
+            System.out.println("(1) Cadastrar-se");
+            System.out.println("(2) Login");
+        }
+        if (loggedInUser != null) {
+            System.out.println("(4) Salvar senha");
+            System.out.println("(5) Listar senhas");
+            System.out.println("(6) Logout");
+        }
+        if (loggedInUser == null) {
+            System.out.println("(3) Sair\n");
+        }
     }
 
     public static void main(String[] args) {
-
         Main main = new Main();
-        String operacao = "empty";
+        int operacao = 0;
+
         do {
             main.printMenu();
             try {
@@ -128,6 +167,6 @@ public class Main {
                 ex.printStackTrace();
                 System.out.println("Escolha uma das operações pelo número: " + ex);
             }
-        } while (!operacao.equals("Encerrar"));
+        } while (operacao != 3);
     }
 }

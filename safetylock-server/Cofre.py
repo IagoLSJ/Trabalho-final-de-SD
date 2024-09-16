@@ -1,46 +1,75 @@
-import json
-from jsonmanager import JsonManager
+from jsonManager import JsonManager
+from entities.message import Message
+from entities.user import User
+from entities.password import Password
 
-class Cofre :
 
+class Cofre:
     def __init__(self) -> None:
         self.usersdb = '\\data\\usersdb.json'
         self.passworddb = '\\data\\passworddb.json'
         self.jmanager = JsonManager()
-    
-    def sign_up(self, user) :
-        res = self.jmanager.add_to_list(self.usersdb, user)
-        if not res:
-            return json.loads({"status" : "500", "body" : "Internal Server Error"})
-        else : 
-            return json.loads({"status" : "200", "body" : "Seja bem-vinda(o),"+user['username']+"!"})
 
-    def login(self, user) :
-        data = self.jmanager.get_file_contents(self.usersdb)
-        if not data : 
-            return json.loads({"status" : "500", "body" : "Internal Server Error"})
-        else :
-            for item in data :
-                if item['email'] == user['email']:
-                    if item['password'] == user['password'] :
-                        return json.loads({"status" : "200", "body" : "Seja bem-vinda(o),"+item['username']+"!"})
-                    else : 
-                        return json.loads({"status" : "401", "body" : "Credenciais inválidas!"})
-                    
-            return json.loads({"status" : "404", "body" : "O email informado não está na nossa base de dados!"})
-            
-                 
-    
-    def salvar_senha(self, password) :
-        res = self.jmanager.add_to_list(self.passworddb, password)
+    def sign_up(self, id: str, username: str, email: str, userpass: str) -> Message:
+        user = User(id, username, email, userpass)
+        res = self.jmanager.add_to_list(self.usersdb, user.to_dict())
         if not res:
-            return json.loads({"status" : "500", "body" : "Internal Server Error"})
-        else : 
-            return json.loads({"status" : "200", "body" : "Senha salva com sucesso!"})
-    
-    def listar_senha(self) :
-        res = self.jmanager.get_file_contents(self.passworddb)
+            message = Message(
+                arguments={"status": 500, "message": "Internal Server Error"}
+            )
+        else:
+            message = Message(
+                arguments={
+                    "data": user.to_dict(),
+                    "status": 200, "message": "Seja bem-vinda(o), " + username + "!"}
+            )
+
+        return message.arguments
+
+    def login(self, email: str, userpass: str) -> Message:
+        user = self.jmanager.get_user_by_credentials(
+            self.usersdb, email, userpass)
+
+        if not user:
+            message = Message(
+                arguments={"status": 401,
+                           "message": "Credenciais inválidas!"}
+            )
+        else:
+            message = Message(
+                arguments={"data": user, "status": 200,
+                           "message": "Seja bem-vinda(o), " + user['username'] + "!"}
+            )
+
+        return message.arguments
+
+    def salvar_senha(self, title: str, password: str, userId: str) -> Message:
+        senha = Password(title, password, userId)
+        res = self.jmanager.add_to_list(self.passworddb, senha.to_dict())
         if not res:
-            return json.loads({"status" : "500", "body" : "Internal Server Error"})
-        else : 
-            return json.loads({"status" : "200", "body" : res})
+            message = Message(
+                arguments={"status": 500, "message": "Internal Server Error"}
+            )
+        else:
+            message = Message(
+                arguments={"data": senha.to_dict(), "status": 200,
+                           "message": "Senha salva com sucesso!"}
+            )
+
+        return message.arguments
+
+    def listar_senhas(self, userId: str) -> Message:
+        res = self.jmanager.get_passwords_by_user_id(userId)
+
+        if res is None:  # Em caso de erro ao recuperar senhas, status de erro
+            message = Message(
+                arguments={"status": 500, "message": "Internal Server Error"}
+            )
+        else:
+            message = Message(
+                arguments={"data": res if res else [],  # Retorna lista vazia se res for vazio
+                           "status": 200,
+                           "message": "Senhas retornadas com sucesso!"}
+            )
+
+        return message.arguments

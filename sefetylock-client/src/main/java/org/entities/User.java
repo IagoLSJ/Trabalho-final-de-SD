@@ -1,23 +1,31 @@
-package org.objects;
+package org.entities;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String userId;
+    private String id;
     private String email;
     private String username;
     private String userpass;
 
-    public User(String userId, String username, String userpass, String email) {
+    public User(String username, String userpass, String email) {
         this.email = email;
         this.userpass = userpass;
         this.username = username;
-        this.userId = userId;
+        this.id = generateUserId();
     }
 
-    public User(){}
+    public User() {
+        this.id = generateUserId();
+    }
+
+    // Gera um UUID aleatório para userId
+    private String generateUserId() {
+        return UUID.randomUUID().toString();
+    }
 
     // Getters e Setters
     public String getEmail() {
@@ -44,18 +52,14 @@ public class User implements Serializable {
         this.username = username;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public String getId() {
+        return id;
     }
 
     @Override
     public String toString() {
         return "User{" +
-                "id=" + userId +
+                "id=" + id +
                 ", name='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + userpass + '\'' +

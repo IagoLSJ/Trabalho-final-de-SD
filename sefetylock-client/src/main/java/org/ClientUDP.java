@@ -9,7 +9,7 @@ public class ClientUDP {
     private InetAddress address;
     private int portServer;
 
-    public ClientUDP(String ipServer, int portServer){
+    public ClientUDP(String ipServer, int portServer) {
         try {
             this.socket = new DatagramSocket();
             this.address = InetAddress.getByName(ipServer);
@@ -25,10 +25,9 @@ public class ClientUDP {
                     requestData,
                     requestData.length,
                     this.address,
-                    this.portServer
-            );
+                    this.portServer);
             this.socket.send(packet);
-        } catch ( IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -39,22 +38,21 @@ public class ClientUDP {
         try {
             DatagramPacket receivedPacket = new DatagramPacket(
                     response,
-                    response.length
-            );
+                    response.length);
             this.socket.setSoTimeout(1000);
             this.socket.receive(receivedPacket);
             byte[] data = receivedPacket.getData();
             return Arrays.copyOf(data, receivedPacket.getLength());
-        } catch ( SocketTimeoutException ste ) {
+        } catch (SocketTimeoutException ste) {
             throw ste;
-        } catch ( IOException e ) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
         return null;
     }
 
-    public void close(){
+    public void close() {
         this.socket.close();
     }
 }
