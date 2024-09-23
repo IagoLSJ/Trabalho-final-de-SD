@@ -4,5 +4,11 @@
     "username": "alex",
     "email": "alex@email.com",
     "userpass": "3301"
+  },
+  {
+    "id": "a98bf2b1-4123-4aeb-960e-e0d3ad982782",
+    "username": "Maria Eduarda",
+    "email": "mariaduda@abc",
+    "userpass": "1234"
   }
 ]

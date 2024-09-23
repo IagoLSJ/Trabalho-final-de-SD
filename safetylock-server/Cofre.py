@@ -1,4 +1,4 @@
-from jsonManager import JsonManager
+from jsonmanager import JsonManager
 from entities.message import Message
 from entities.user import User
 from entities.password import Password
