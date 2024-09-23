@@ -17,7 +17,8 @@ import java.util.List;
 import java.lang.reflect.Type;
 
 public class ProxyClient {
-    int requestId;
+    int countRequests = 0;
+    String lastRequestId = "";
     ClientUDP clientUDP = new ClientUDP("localhost", 9090);
     Gson gson = new Gson();
 
@@ -127,7 +128,12 @@ public class ProxyClient {
 
     private String empacotaMensagem(String objectRef, String method, String args) {
         try {
+            countRequests++;
             Message message = new Message();
+            if (countRequests % 2 == 0 && !lastRequestId.isEmpty()) {
+                message.setId(lastRequestId);
+            }
+            lastRequestId = message.getId();
             message.setType("request");
             message.setMethod(method);
             message.setObjReference(objectRef);

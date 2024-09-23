@@ -45,7 +45,7 @@ class Connection:
                 resultado = self.despachante.dispatch(json.dumps(msg))
                 result_data = json.loads(resultado)
                 Connection.processed_requests[request_id] = result_data
-                self.send_reply({"data": result_data})
+                self.send_reply(result_data)
 
         except Exception as e:
             print(f"Connection: {e}")
