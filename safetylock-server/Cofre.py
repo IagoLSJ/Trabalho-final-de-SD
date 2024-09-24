@@ -29,11 +29,11 @@ class Cofre:
             return user
 
     def salvar_senha(self, password: Password):
-        res = self.jmanager.add_to_list(self.passworddb, password)
+        res = self.jmanager.add_to_list(self.passworddb, password.to_dict())
         if not res:
             return 'Internal Server Error'
         else:
-            return password.to_dict()
+            return password
 
     def listar_senhas(self, userId: str):
         res = self.jmanager.get_passwords_by_user_id(userId)

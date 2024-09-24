@@ -22,7 +22,7 @@ class Esqueleto:
         try:
             requestBody = json.loads(requestBody)
             response = self.cofre.login(requestBody['email'], requestBody['userpass'])
-            return response.to_dict()
+            return response
         except ValueError as error:
             return str(error)
         except Exception as e:

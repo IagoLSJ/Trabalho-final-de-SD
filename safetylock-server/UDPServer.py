@@ -51,9 +51,23 @@ class Connection:
         except Exception as e:
             print(f"Connection: {e}")
 
+    def build_message(self, response_data, request_id) :
+        message = Message(type='response')
+        if not isinstance(response_data, str) :
+            message.arguments = {
+                    "data": response_data,
+                    "status": 200, "message": "Operação realizada com sucesso!"
+            }
+        else: 
+            message.arguments = {
+                    "status": 500, "message": response_data
+            }
+        return message.to_dict()
+
     def send_reply(self, response_data, request_id):
-        response_json = json.dumps(response_data).encode('utf-8')
-        print(response_data)
+        res = self.build_message(response_data=response_data, request_id=request_id)
+        response_json = json.dumps(res).encode('utf-8')
+        print(res)
         self.server_socket.sendto(response_json, self.client_address)
 
 
