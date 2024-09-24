@@ -1,7 +1,8 @@
 import json
 import socket
-from despachante import Despachante
+from Despachante import Despachante
 from entities.message import Message
+import random
 
 
 class UDPServer:
@@ -24,8 +25,8 @@ class UDPServer:
 
 
 class Connection:
-    # Usar um dicionário para rastrear IDs e resultados
     processed_requests = {}
+    processed_responses = {}
 
     def __init__(self, server_socket, client_address, data):
         self.incoming_data = data
@@ -40,34 +41,44 @@ class Connection:
 
             request_id = msg.get('id')
             if request_id in Connection.processed_requests:
-                print("Duplicated Request")
-                self.send_reply(Connection.processed_requests[request_id], request_id)
+
+                previous_request = Connection.processed_requests[request_id]
+                if (msg.get('method') == previous_request.get('method') and
+                        msg.get('arguments') == previous_request.get('arguments')):
+                    print("Duplicated Request", msg.get('method'))
+                    self.send_reply(Connection.processed_responses[request_id])
             else:
-                resultado = self.despachante.dispatch(msg['method'], msg['arguments'])
+                resultado = self.despachante.dispatch(
+                    msg['method'], msg['arguments'])
                 result_data = resultado
-                Connection.processed_requests[request_id] = result_data
-                self.send_reply(result_data, request_id)
+
+                Connection.processed_requests[request_id] = msg
+                Connection.processed_responses[request_id] = result_data
+
+                sendResponse = random.randint(1, 10)
+                if (sendResponse > 4):
+                    self.send_reply(result_data)
 
         except Exception as e:
             print(f"Connection: {e}")
 
-    def build_message(self, response_data, request_id) :
+    def build_message(self, response_data):
         message = Message(type='response')
-        if not isinstance(response_data, str) :
+        if not isinstance(response_data, str):
             message.arguments = {
-                    "data": response_data,
-                    "status": 200, "message": "Operação realizada com sucesso!"
+                "data": response_data,
+                "status": 200, "message": "Operação realizada com sucesso!"
             }
-        else: 
+        else:
             message.arguments = {
-                    "status": 500, "message": response_data
+                "status": 500, "message": response_data
             }
         return message.to_dict()
 
-    def send_reply(self, response_data, request_id):
-        res = self.build_message(response_data=response_data, request_id=request_id)
+    def send_reply(self, response_data):
+        res = self.build_message(
+            response_data=response_data)
         response_json = json.dumps(res).encode('utf-8')
-        print(res)
         self.server_socket.sendto(response_json, self.client_address)
 
 

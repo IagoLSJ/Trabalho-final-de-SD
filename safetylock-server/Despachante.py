@@ -1,6 +1,5 @@
 import json
-from esqueleto import Esqueleto
-from entities.message import Message
+from Esqueleto import Esqueleto
 
 
 class Despachante:
@@ -30,4 +29,4 @@ class Despachante:
 
         except Exception as e:
             print(f"Erro no Despachante: {e}")
-            return json.dumps({"error": "Internal server error"})
+            return json.dumps({"Erro no Despachante": "Internal server error"})

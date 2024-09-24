@@ -1,8 +1,6 @@
-from jsonmanager import JsonManager
-from entities.message import Message
+from jsonManager import JsonManager
 from entities.user import User
 from entities.password import Password
-import json
 
 
 class Cofre:
@@ -16,29 +14,29 @@ class Cofre:
     def sign_up(self, user: User):
         res = self.jmanager.add_to_list(self.usersdb, user.to_dict())
         if not res:
-            return 'Internal Server Error'
+            return 'An error occurred during registration, please try again.'
         else:
             return user
 
-    def login(self, email : str, userpass :str):
+    def login(self, email: str, userpass: str):
         user = self.jmanager.get_user_by_credentials(
             self.usersdb, email, userpass)
         if not user:
-            return 'Internal Server Error'
+            return 'Invalid Credentials.'
         else:
             return user
 
     def salvar_senha(self, password: Password):
         res = self.jmanager.add_to_list(self.passworddb, password.to_dict())
         if not res:
-            return 'Internal Server Error'
+            return 'Unable to save password, please try again.'
         else:
             return password
 
     def listar_senhas(self, userId: str):
         res = self.jmanager.get_passwords_by_user_id(userId)
 
-        if res is None:  # Em caso de erro ao recuperar senhas, status de erro
-            return 'Internal Server Error'
+        if res is None:
+            return 'Unable to list passwords, please try again.'
         else:
             return res if res else []
