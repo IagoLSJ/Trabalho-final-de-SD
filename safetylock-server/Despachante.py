@@ -4,40 +4,28 @@ from entities.message import Message
 
 
 class Despachante:
-    def dispatch(self, request):
+    def dispatch(self, method, request_args):
         try:
             # Converte a string JSON em um dicionário
-            request_dict = json.loads(request)
-
-            # Cria um objeto Message a partir do dicionário
-            message = Message.from_dict(request_dict)
-
-            # Converte arguments de JSON para dicionário, se necessário
-            if isinstance(message.arguments, str):
-                message.arguments = json.loads(message.arguments)
-
             esqueleto = Esqueleto()
 
             # Verifica o método solicitado e chama o método correspondente no Esqueleto
-            if message.method == "sign_up":
-                message.arguments = esqueleto.sign_up(message.arguments)
-                message.type = 'response'
-                return json.dumps(message.to_dict())
+            if method == "sign_up":
+                response = esqueleto.sign_up(request_args)
+                return response
 
-            elif message.method == "login":
-                message.arguments = esqueleto.login(message.arguments)
-                message.type = 'response'
-                return json.dumps(message.to_dict())
+            elif method == "login":
+                response = esqueleto.login(request_args)
+                print(response)
+                return response
 
-            elif message.method == "salvar_senha":
-                message.arguments = esqueleto.salvar_senha(message.arguments)
-                message.type = 'response'
-                return json.dumps(message.to_dict())
+            elif method == "salvar_senha":
+                response = esqueleto.salvar_senha(request_args)
+                return response
 
-            elif message.method == "listar_senhas":
-                message.arguments = esqueleto.listar_senhas(message.arguments)
-                message.type = 'response'
-                return json.dumps(message.to_dict())
+            elif method == "listar_senhas":
+                response = esqueleto.listar_senhas(request_args)
+                return response
             else:
                 return json.dumps({"error": "Invalid method"})
 

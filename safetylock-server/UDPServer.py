@@ -1,6 +1,7 @@
 import json
 import socket
 from despachante import Despachante
+from entities.message import Message
 
 
 class UDPServer:
@@ -40,18 +41,19 @@ class Connection:
             request_id = msg.get('id')
             if request_id in Connection.processed_requests:
                 print("Duplicated Request")
-                self.send_reply(Connection.processed_requests[request_id])
+                self.send_reply(Connection.processed_requests[request_id], request_id)
             else:
-                resultado = self.despachante.dispatch(json.dumps(msg))
-                result_data = json.loads(resultado)
+                resultado = self.despachante.dispatch(msg['method'], msg['arguments'])
+                result_data = resultado
                 Connection.processed_requests[request_id] = result_data
-                self.send_reply(result_data)
+                self.send_reply(result_data, request_id)
 
         except Exception as e:
             print(f"Connection: {e}")
 
-    def send_reply(self, response_data):
-        response_json = json.dumps(response_data).encode('utf-8')
+    def send_reply(self, response_data, request_id):
+        res = Message(Connection.processed_requests[request_id], type='response', arguments={'status' : int(500), 'body' : response_data}).to_dict()
+        response_json = json.dumps(res).encode('utf-8')
         self.server_socket.sendto(response_json, self.client_address)
 
 

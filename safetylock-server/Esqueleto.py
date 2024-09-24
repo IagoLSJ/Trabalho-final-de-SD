@@ -1,6 +1,7 @@
 from cofre import Cofre
 from entities.user import User
 from entities.password import Password
+import json
 
 
 class Esqueleto:
@@ -10,7 +11,7 @@ class Esqueleto:
 
     def sign_up(self, requestBody):
         try:
-            requestBody = requestBody.to_dict()
+            requestBody = json.loads(requestBody)
             user = User(requestBody['id'], requestBody['username'], requestBody['email'], requestBody['userpass'])
             response = self.cofre.sign_up(user=user)
             return response
@@ -19,8 +20,8 @@ class Esqueleto:
 
     def login(self, requestBody):
         try:
-            #requestBody = requestBody.to_dict()
-            user = User(requestBody['email'], requestBody['userPass'])
+            requestBody = json.loads(requestBody)
+            user = User('', '', requestBody['email'], requestBody['userPass'])
             response = self.cofre.login(user)
             return response
         except ValueError as error:
@@ -30,7 +31,7 @@ class Esqueleto:
 
     def salvar_senha(self, requestBody):
         try:
-            requestBody = requestBody.to_dict()
+            requestBody = json.loads(requestBody)
             password = Password(requestBody['title'], requestBody['password'], requestBody['userId'])
             response = self.cofre.salvar_senha(password=password)
             return response
@@ -40,6 +41,7 @@ class Esqueleto:
             return str(e)
 
     def listar_senhas(self, requestBody):
+        requestBody = json.loads(requestBody)
         userId: str = requestBody['userId']
         try:
             response = self.cofre.listar_senhas(userId)
