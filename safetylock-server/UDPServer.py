@@ -52,8 +52,8 @@ class Connection:
             print(f"Connection: {e}")
 
     def send_reply(self, response_data, request_id):
-        res = Message(Connection.processed_requests[request_id], type='response', arguments={'status' : int(500), 'body' : response_data}).to_dict()
-        response_json = json.dumps(res).encode('utf-8')
+        response_json = json.dumps(response_data).encode('utf-8')
+        print(response_data)
         self.server_socket.sendto(response_json, self.client_address)
 
 

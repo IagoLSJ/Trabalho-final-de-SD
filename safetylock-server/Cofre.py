@@ -2,6 +2,7 @@ from jsonmanager import JsonManager
 from entities.message import Message
 from entities.user import User
 from entities.password import Password
+import json
 
 
 class Cofre:
@@ -13,15 +14,15 @@ class Cofre:
         self.e.add_note('Internal Server Error')
 
     def sign_up(self, user: User):
-        res = self.jmanager.add_to_list(self.usersdb, user)
+        res = self.jmanager.add_to_list(self.usersdb, user.to_dict())
         if not res:
             return 'Internal Server Error'
         else:
             return user
 
-    def login(self, user: User):
+    def login(self, email : str, userpass :str):
         user = self.jmanager.get_user_by_credentials(
-            self.usersdb, user['email'], user['userpass'])
+            self.usersdb, email, userpass)
         if not user:
             return 'Internal Server Error'
         else:

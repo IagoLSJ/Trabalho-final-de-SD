@@ -16,7 +16,6 @@ class Despachante:
 
             elif method == "login":
                 response = esqueleto.login(request_args)
-                print(response)
                 return response
 
             elif method == "salvar_senha":

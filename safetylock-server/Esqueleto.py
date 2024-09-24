@@ -14,16 +14,15 @@ class Esqueleto:
             requestBody = json.loads(requestBody)
             user = User(requestBody['id'], requestBody['username'], requestBody['email'], requestBody['userpass'])
             response = self.cofre.sign_up(user=user)
-            return response
+            return response.to_dict()
         except Exception as e:
             return str(e)
 
     def login(self, requestBody):
         try:
             requestBody = json.loads(requestBody)
-            user = User('', '', requestBody['email'], requestBody['userPass'])
-            response = self.cofre.login(user)
-            return response
+            response = self.cofre.login(requestBody['email'], requestBody['userpass'])
+            return response.to_dict()
         except ValueError as error:
             return str(error)
         except Exception as e:
@@ -34,7 +33,7 @@ class Esqueleto:
             requestBody = json.loads(requestBody)
             password = Password(requestBody['title'], requestBody['password'], requestBody['userId'])
             response = self.cofre.salvar_senha(password=password)
-            return response
+            return response.to_dict()
         except ValueError as error:
             return str(error)
         except Exception as e:
