@@ -1,4 +1,6 @@
 from cofre import Cofre
+from entities.user import User
+from entities.password import Password
 
 
 class Esqueleto:
@@ -7,32 +9,35 @@ class Esqueleto:
         self.cofre = Cofre()
 
     def sign_up(self, requestBody):
-        id: str = requestBody['id']
-        username: str = requestBody['username']
-        email: str = requestBody['email']
-        userpass: str = requestBody['userpass']
-
-        response = self.cofre.sign_up(id, username, email, userpass)
-        return response
+        try:
+            requestBody = requestBody.to_dict()
+            user = User(requestBody['id'], requestBody['username'], requestBody['email'], requestBody['userpass'])
+            response = self.cofre.sign_up(user=user)
+            return response
+        except Exception as e:
+            return str(e)
 
     def login(self, requestBody):
-        email: str = requestBody['email']
-        userpass: str = requestBody['userpass']
         try:
-            response = self.cofre.login(email, userpass)
+            #requestBody = requestBody.to_dict()
+            user = User(requestBody['email'], requestBody['userPass'])
+            response = self.cofre.login(user)
             return response
         except ValueError as error:
-            raise error
+            return str(error)
+        except Exception as e:
+            return str(e)
 
     def salvar_senha(self, requestBody):
-        title: str = requestBody['title']
-        password: str = requestBody['password']
-        userId: str = requestBody['userId']
         try:
-            response = self.cofre.salvar_senha(title, password, userId)
+            requestBody = requestBody.to_dict()
+            password = Password(requestBody['title'], requestBody['password'], requestBody['userId'])
+            response = self.cofre.salvar_senha(password=password)
             return response
         except ValueError as error:
-            raise error
+            return str(error)
+        except Exception as e:
+            return str(e)
 
     def listar_senhas(self, requestBody):
         userId: str = requestBody['userId']
@@ -40,4 +45,6 @@ class Esqueleto:
             response = self.cofre.listar_senhas(userId)
             return response
         except ValueError as error:
-            raise error
+            return str(error)
+        except Exception as e:
+            return str(e)

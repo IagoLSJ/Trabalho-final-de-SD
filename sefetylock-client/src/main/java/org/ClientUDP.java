@@ -39,7 +39,7 @@ public class ClientUDP {
             DatagramPacket receivedPacket = new DatagramPacket(
                     response,
                     response.length);
-            this.socket.setSoTimeout(1000);
+            this.socket.setSoTimeout(3000);
             this.socket.receive(receivedPacket);
             byte[] data = receivedPacket.getData();
             return Arrays.copyOf(data, receivedPacket.getLength());

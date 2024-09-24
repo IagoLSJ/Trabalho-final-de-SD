@@ -4,6 +4,11 @@ class User:
         self.username = username
         self.email = email
         self.userpass = userpass
+    
+    def __init__(self, email, userpass) :
+        self.email = email
+        self.userpass = userpass
+
 
     def setUsername(self, username):
         self.username = username

@@ -9,67 +9,35 @@ class Cofre:
         self.usersdb = '\\data\\usersdb.json'
         self.passworddb = '\\data\\passworddb.json'
         self.jmanager = JsonManager()
+        self.e = Exception()
+        self.e.add_note('Internal Server Error')
 
-    def sign_up(self, id: str, username: str, email: str, userpass: str) -> Message:
-        user = User(id, username, email, userpass)
-        res = self.jmanager.add_to_list(self.usersdb, user.to_dict())
+    def sign_up(self, user: User):
+        res = self.jmanager.add_to_list(self.usersdb, user)
         if not res:
-            message = Message(
-                arguments={"status": 500, "message": "Internal Server Error"}
-            )
+            return 'Internal Server Error'
         else:
-            message = Message(
-                arguments={
-                    "data": user.to_dict(),
-                    "status": 200, "message": "Seja bem-vinda(o), " + username + "!"}
-            )
+            return user
 
-        return message.arguments
-
-    def login(self, email: str, userpass: str) -> Message:
+    def login(self, user: User):
         user = self.jmanager.get_user_by_credentials(
-            self.usersdb, email, userpass)
-
+            self.usersdb, user['email'], user['userpass'])
         if not user:
-            message = Message(
-                arguments={"status": 401,
-                           "message": "Credenciais inválidas!"}
-            )
+            return 'Internal Server Error'
         else:
-            message = Message(
-                arguments={"data": user, "status": 200,
-                           "message": "Seja bem-vinda(o), " + user['username'] + "!"}
-            )
+            return user
 
-        return message.arguments
-
-    def salvar_senha(self, title: str, password: str, userId: str) -> Message:
-        senha = Password(title, password, userId)
-        res = self.jmanager.add_to_list(self.passworddb, senha.to_dict())
+    def salvar_senha(self, password: Password):
+        res = self.jmanager.add_to_list(self.passworddb, password)
         if not res:
-            message = Message(
-                arguments={"status": 500, "message": "Internal Server Error"}
-            )
+            return 'Internal Server Error'
         else:
-            message = Message(
-                arguments={"data": senha.to_dict(), "status": 200,
-                           "message": "Senha salva com sucesso!"}
-            )
+            return password.to_dict()
 
-        return message.arguments
-
-    def listar_senhas(self, userId: str) -> Message:
+    def listar_senhas(self, userId: str):
         res = self.jmanager.get_passwords_by_user_id(userId)
 
         if res is None:  # Em caso de erro ao recuperar senhas, status de erro
-            message = Message(
-                arguments={"status": 500, "message": "Internal Server Error"}
-            )
+            return 'Internal Server Error'
         else:
-            message = Message(
-                arguments={"data": res if res else [],  # Retorna lista vazia se res for vazio
-                           "status": 200,
-                           "message": "Senhas retornadas com sucesso!"}
-            )
-
-        return message.arguments
+            return res if res else []
